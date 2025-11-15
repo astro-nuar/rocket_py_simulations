@@ -68,7 +68,6 @@ def load_flight_from_json(config_path: str):
 
     # Rail buttons
     rb = rocket_data["rail_buttons"]
-    
     rocket.set_rail_buttons(
         upper_button_position=rb["upper_button_position"],
         lower_button_position=rb["lower_button_position"],
@@ -91,8 +90,8 @@ def load_flight_from_json(config_path: str):
         tip_chord=fins["tip_chord"],
         span=fins["span"],
         position=fins["position"],
-        cant_angle=fins["cant_angle"],
-        airfoil=(path + fins["airfoil"], "radians"),
+        cant_angle=fins["cant_angle"]
+        # airfoil=(path + fins["airfoil"], "radians"),
     )
 
     # Tail
@@ -111,7 +110,7 @@ def load_flight_from_json(config_path: str):
         
             chute_data["name"],
         
-            cd_s=chute_data["cd_s"],
+            cd_s= int(chute_data["drag_coefficiente"]) * int(chute_data["area"]),
         
             trigger=chute_data["trigger"],
         

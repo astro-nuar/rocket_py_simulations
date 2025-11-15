@@ -16,5 +16,6 @@ def main():
             file.write(f"{k}, {v}\n")
             
     #flight_info.all()
+    rocket.draw()
 
 main()

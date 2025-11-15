@@ -46,18 +46,17 @@
             "angular_position": 45
         },
         "nose_cone": {
-            "length": 0.55829,
+            "length": 0.500,
             "kind": "vonKarman",
-            "position": 1.278
+            "position": 2.0
         },
         "fins": {
             "number": 4,
-            "root_chord": 0.120,
-            "tip_chord": 0.060,
-            "span": 0.110,
+            "root_chord": 0.20,
+            "tip_chord": 0.160,
+            "span": 0.090,
             "position": -1.04956,
-            "cant_angle": 0.5,
-            "airfoil": "NACA0012-radians.csv"
+            "cant_angle": 0
         },
         "tail": {
             "top_radius": 0.0625,
@@ -68,15 +67,17 @@
         "parachutes": {
             "main": {
                 "name": "Main",
-                "cd_s": 10.0,
-                "trigger": 800,
+                "drag_coefficiente": 1.5,
+                "area": 17.07,
+                "trigger": 470,
                 "sampling_rate": 105,
                 "lag": 1.5,
                 "noise": [0, 8.3, 0.5]
             },
             "drogue": {
                 "name": "Drogue",
-                "cd_s": 1.0,
+                "drag_coefficiente": 1.5,
+                "area": 0.40,
                 "trigger": "apogee",
                 "sampling_rate": 105,
                 "lag": 1.5,
