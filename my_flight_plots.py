@@ -50,8 +50,6 @@ class _MyFlightPlots:
         "Max AeroLift Resultant Force (N)": float(np.max(self.flight.aerodynamic_lift[:, 1])),
         "Max AeroBending Resultant Moment (N m)": float(np.max(self.flight.aerodynamic_bending_moment[:, 1])),
         "Max AeroSpin Moment (N m)": float(np.max(self.flight.aerodynamic_spin_moment[:, 1])),
-        "Max Thrust Absolute Power (W)": float(np.max(self.flight.thrust_power[:, 1])),
-        "Max Drag Absolute Power (W)": float(np.max(-self.flight.drag_power[:, 1])),
     }
 
         return None

@@ -104,6 +104,8 @@ test_flight = Flight(
     rocket=calisto, environment=env, rail_length=5.2, inclination=85, heading=0
 )
 
+calisto.draw()
+
 Pro75M1670.all_info()
 #fin_set.all_info()
 

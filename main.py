@@ -14,8 +14,9 @@ def main():
         
         for k, v in flight_info.motor_tradeoff_json.items():
             file.write(f"{k}, {v}\n")
-            
-    #flight_info.all()
-    rocket.draw()
+            print(f"{k}, {v}\n")
+
+    flight_info.all()
+
 
 main()
