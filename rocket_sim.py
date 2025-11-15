@@ -3,6 +3,7 @@ from rocketpy import Environment, SolidMotor, Rocket, Flight
 import datetime
 from my_flight_plots import _MyFlightPlots
 
+path = r".\\specifications\\"
 
 # Create the environment
 env = Environment(
@@ -20,7 +21,7 @@ env.set_atmospheric_model(type="standard_atmosphere")
 
 # Define the motor
 Pro75M1670 = SolidMotor(
-    thrust_source="C:\\Users\\caval\\Documents\\Universidade\\Nuar\\Euroc_Eletro\\Simulacao\\Cesaroni_M1670.eng",
+    thrust_source=path+"Cesaroni_M2020.eng",
     dry_mass=1.815,
     dry_inertia=(0.125, 0.125, 0.002),
     nozzle_radius=33 / 1000,
@@ -43,8 +44,8 @@ calisto = Rocket(
     radius=127 / 2000,
     mass=14.426,
     inertia=(6.321, 6.321, 0.034),
-    power_off_drag="C:\\Users\\caval\\Documents\\Universidade\\Nuar\\Euroc_Eletro\\Simulacao\\powerOffDragCurve.csv",
-    power_on_drag="C:\\Users\\caval\\Documents\\Universidade\\Nuar\\Euroc_Eletro\\Simulacao\\powerOnDragCurve.csv",
+    power_off_drag=path+"powerOffDragCurve.csv",
+    power_on_drag=path+"powerOnDragCurve.csv",
     center_of_mass_without_motor=0,
     coordinate_system_orientation="tail_to_nose",
 )
@@ -70,7 +71,7 @@ fin_set = calisto.add_trapezoidal_fins(
     span=0.110,
     position=-1.04956,
     cant_angle=0.5,
-    airfoil=("C:\\Users\\caval\\Documents\\Universidade\\Nuar\\Euroc_Eletro\\Simulacao\\NACA0012-radians.csv", "radians"),
+    airfoil=(path+"NACA0012-radians.csv", "radians"),
 )
 
 # Add tail
@@ -103,6 +104,9 @@ test_flight = Flight(
     rocket=calisto, environment=env, rail_length=5.2, inclination=85, heading=0
 )
 
+Pro75M1670.all_info()
+#fin_set.all_info()
+
 # Generate flight information and plot altitude vs. time
-plots = _MyFlightPlots(test_flight)
-plots.all()
+#plots = _MyFlightPlots(test_flight, Pro75M1670)
+#plots.all()

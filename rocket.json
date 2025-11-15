@@ -1,0 +1,94 @@
+{
+    "path": ".\\specifications\\",
+    
+    "environment": {
+        "Location": "Campo Militar de Santa Margarida",
+        "latitude": 39.3900032043457,
+        "longitude": -8.2895383834838,
+        "elevation": 107,
+        "date":"2026-10-20",
+        "datum": "WGS84",
+        "timezone": "Portugal",
+        "atmospheric_model": "standard_atmosphere"
+    },
+    
+    "motor": {
+        "name": "Pro98M1450",
+        "thrust_source": "Cesaroni_9955M1450-P.eng",
+        "dry_mass": 3.748,
+        "dry_inertia": [0.125, 0.125, 0.002],
+        "nozzle_radius": 0.033,
+        "grain_number": 4,
+        "grain_density": 1815,
+        "grain_outer_radius": 0.033,
+        "grain_initial_inner_radius": 0.015,
+        "grain_initial_height": 0.120,
+        "grain_separation": 0.005,
+        "grains_center_of_mass_position": 0.397,
+        "center_of_dry_mass_position": 0.317,
+        "nozzle_position": 0,
+        "burn_time": 6.9,
+        "throat_radius": 0.011,
+        "coordinate_system_orientation": "nozzle_to_combustion_chamber"
+    },
+    
+    "rocket": {
+        "radius": 0.0625,
+        "mass": 30,
+        "inertia": [6.321, 6.321, 0.034],
+        "power_off_drag": "powerOffDragCurve.csv",
+        "power_on_drag": "powerOnDragCurve.csv",
+        "center_of_mass_without_motor": 0,
+        "coordinate_system_orientation": "tail_to_nose",
+        "rail_buttons": {
+            "upper_button_position": 0.0818,
+            "lower_button_position": -0.618,
+            "angular_position": 45
+        },
+        "nose_cone": {
+            "length": 0.55829,
+            "kind": "vonKarman",
+            "position": 1.278
+        },
+        "fins": {
+            "number": 4,
+            "root_chord": 0.120,
+            "tip_chord": 0.060,
+            "span": 0.110,
+            "position": -1.04956,
+            "cant_angle": 0.5,
+            "airfoil": "NACA0012-radians.csv"
+        },
+        "tail": {
+            "top_radius": 0.0625,
+            "bottom_radius": 0.0435,
+            "length": 0.060,
+            "position": -1.194656
+        },
+        "parachutes": {
+            "main": {
+                "name": "Main",
+                "cd_s": 10.0,
+                "trigger": 800,
+                "sampling_rate": 105,
+                "lag": 1.5,
+                "noise": [0, 8.3, 0.5]
+            },
+            "drogue": {
+                "name": "Drogue",
+                "cd_s": 1.0,
+                "trigger": "apogee",
+                "sampling_rate": 105,
+                "lag": 1.5,
+                "noise": [0, 8.3, 0.5]
+            }
+        }
+    },
+    
+    "flight": {
+        "comments": "rail_lenght is as defined in the regulation",
+        "rail_length": 4,
+        "inclination": 85,
+        "heading": 0
+    }
+}

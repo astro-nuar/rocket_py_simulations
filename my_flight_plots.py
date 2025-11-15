@@ -17,9 +17,9 @@ class _MyFlightPlots:
     _FlightPlots.first_event_time_index : int
         Time index of first event.
     """
-    output_dir = "Simulacao\images"
+    output_dir = "Simulation\images"
 
-    def __init__(self, flight):
+    def __init__(self, flight, motor):
         """Initializes _FlightPlots class.
 
         Parameters
@@ -32,6 +32,28 @@ class _MyFlightPlots:
         None
         """
         self.flight = flight
+        self.motor = motor
+        self.motor_tradeoff_json = {
+        # --- Motor information (first, as requested) ---
+        "Max Thrust (N)": self.motor.max_thrust,
+        "Average Thrust (N)": self.motor.average_thrust,
+        "Burn Time (s)": self.motor.burn_duration,
+        "Total Impulse (Ns)": self.motor.total_impulse,
+        
+        # --- Flight performance metrics (after motor info) ---
+        "Max Z (m) - Altitude": float(np.max(self.flight.altitude[:, 1])),
+        "Max Y (m)": float(np.max(self.flight.y[:, 1])),
+        "Max X (m)": float(np.max(self.flight.x[:, 1])),
+        "Max Velocity Magnitude (m/s)": float(np.max(self.flight.speed[:, 1])),
+        "Max Mach Number": float(np.max(self.flight.mach_number[:, 1])),
+        "Max AeroDrag Force (N)": float(np.max(self.flight.aerodynamic_drag[:, 1])),
+        "Max AeroLift Resultant Force (N)": float(np.max(self.flight.aerodynamic_lift[:, 1])),
+        "Max AeroBending Resultant Moment (N m)": float(np.max(self.flight.aerodynamic_bending_moment[:, 1])),
+        "Max AeroSpin Moment (N m)": float(np.max(self.flight.aerodynamic_spin_moment[:, 1])),
+        "Max Thrust Absolute Power (W)": float(np.max(self.flight.thrust_power[:, 1])),
+        "Max Drag Absolute Power (W)": float(np.max(-self.flight.drag_power[:, 1])),
+    }
+
         return None
 
     @cached_property
