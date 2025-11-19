@@ -7,9 +7,9 @@ from rocketpy import EnvironmentAnalysis
 from datetime import datetime
 
 def main():
-    SHOW_ENVIORMENT = True
+    SHOW_ENVIORMENT = False
     SHOW_ROCKET_INFO = False
-    SHOW_FLIGHT_INFO = False
+    SHOW_FLIGHT_INFO = True
 
     # Load everything from JSON
     env, motor, rocket, flight = load_flight_from_json("rocket.json")
@@ -29,7 +29,6 @@ def main():
         unit_system="metric",
     env_analysis.all_info()
     )"""
-
 
     flight_info = _MyFlightPlots(flight, motor)
 

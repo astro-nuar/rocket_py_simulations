@@ -16,7 +16,7 @@
         "timezone": "Portugal",
         "atmospheric_model": 
             {"type": "Reanalysis", 
-            "file_location": ".\\specifications\\Weather\\2b29223b65cdda8d6ace1f38854fb13f\\data_stream-oper_stepType-instant.nc",
+            "file_location": ".\\specifications\\Weather\\EuroC_pressure_levels_reanalysis_2023.nc.nc",
             "dictionary": "ECMWF"
         }
     
