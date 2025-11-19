@@ -43,6 +43,7 @@
     },
 
     "rocket": {
+        "comments": "!! The mass term is WITHOUT the motor, if its 25kg here the rocket will be 25kg + motor mass !!",
         "radius": 0.0625,
         "mass": 22,
         "inertia": [6.321, 6.321, 0.034],
