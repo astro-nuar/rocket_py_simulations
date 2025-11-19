@@ -6,10 +6,20 @@
         "latitude": 39.3900032043457,
         "longitude": -8.2895383834838,
         "elevation": 107,
-        "date": "2026-10-20",
+        "date": {
+            "year": 2023,
+            "month": 10,
+            "day": 14,
+            "hour": 14
+        },
         "datum": "WGS84",
         "timezone": "Portugal",
-        "atmospheric_model": "standard_atmosphere"
+        "atmospheric_model": 
+            {"type": "Reanalysis", 
+            "file_location": ".\\specifications\\Weather\\2b29223b65cdda8d6ace1f38854fb13f\\data_stream-oper_stepType-instant.nc",
+            "dictionary": "ECMWF"
+        }
+    
     },
     
     "motor": {
@@ -34,7 +44,7 @@
 
     "rocket": {
         "radius": 0.0625,
-        "mass": 27.6,
+        "mass": 22,
         "inertia": [6.321, 6.321, 0.034],
         "power_off_drag": "powerOffDragCurve.csv",
         "power_on_drag": "powerOnDragCurve.csv",

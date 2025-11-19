@@ -14,25 +14,22 @@ def load_flight_from_json(config_path: str):
 
     # --- Environment ---
     env_data  =  config["environment"]
+
     env  =  Environment(
+        date=(2023, 10, 14, 14),
         latitude = env_data["latitude"],
         longitude = env_data["longitude"],
         elevation = env_data["elevation"],
     )
 
     # Parse date
-    date_obj  =  datetime.date.fromisoformat(env_data["date"])
-    env.set_date((date_obj.year, date_obj.month, date_obj.day, 12))
-    env.set_atmospheric_model(type = env_data["atmospheric_model"])
-    #env.set_atmospheric_model(type = env_data["atmospheric_model"]["type"],
-    #                            file = env_data["atmospheric_model"]["file"],
-    #                            dictionary = env_data["atmospheric_model"]["dictionary"])
-    #env.set_atmospheric_model(
-    #type = "Reanalysis",
-    #file = "../../data/weather/euroc_2023_all_windows.nc",
-    #dictionary = "ECMWF",
-#)
-
+    d = env_data["date"]
+    env.set_date((d["year"], d["month"], d["day"], d["hour"]))
+    env.set_elevation(env_data["elevation"])
+    env.set_atmospheric_model(type = env_data["atmospheric_model"]["type"],
+                                file = env_data["atmospheric_model"]["file_location"],
+                                dictionary = env_data["atmospheric_model"]["dictionary"])
+    
     # --- Motor ---
     motor_data  =  config["motor"]
     motor  =  SolidMotor(
