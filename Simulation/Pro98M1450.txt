@@ -2,12 +2,12 @@ Max Thrust (N), 2416.0
 Average Thrust (N), 1449.163173216885
 Burn Time (s), 6.87
 Total Impulse (Ns), 9955.751
-Max Z (m) - Altitude, 4095.175811892881
-Max Y (m), 1631.5136545979067
-Max X (m), 0.0003330664161360547
-Max Velocity Magnitude (m/s), 280.4408645696254
-Max Mach Number, 0.825805125817686
-Max AeroDrag Force (N), 217.97827251827357
-Max AeroLift Resultant Force (N), 63947.043796738675
-Max AeroBending Resultant Moment (N m), 1.2938023389197804
-Max AeroSpin Moment (N m), 1.4291139598744262e-13
+Max Z (m) - Altitude, 3004.3072987067594
+Max Y (m), 1108.5354565389073
+Max X (m), 0.0003792987007446314
+Max Velocity Magnitude (m/s), 255.4156927130786
+Max Mach Number, 0.7510931038183651
+Max AeroDrag Force (N), 451.24432899502017
+Max AeroLift Resultant Force (N), 35849.92356829469
+Max AeroBending Resultant Moment (N m), 1.5182343387378257
+Max AeroSpin Moment (N m), 3.9987095959148577e-16

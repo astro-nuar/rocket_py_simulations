@@ -584,72 +584,34 @@ class _MyFlightPlots:
         return None
 
     def energy_data(self):
-        """Prints out all Energy components graphs available about the Flight
-
-        Returns
-        -------
-        None
-        """
+        """Prints out all Energy components graphs available about the Flight"""
 
         fig = plt.figure(figsize=(9, 9))
 
+        t = self.flight.time  # Array of simulation times
+
+        # Sample thrust power function over time
+        thrust_power_values = np.array([self.flight.thrust_power(ti) for ti in t])
+        drag_power_values   = np.array([self.flight.drag_power(ti) for ti in t])
+
         ax1 = plt.subplot(411)
-        ax1.plot(
-            self.flight.kinetic_energy[:, 0],
-            self.flight.kinetic_energy[:, 1],
-            label="Kinetic Energy",
-        )
-        ax1.plot(
-            self.flight.rotational_energy[:, 0],
-            self.flight.rotational_energy[:, 1],
-            label="Rotational Energy",
-        )
-        ax1.plot(
-            self.flight.translational_energy[:, 0],
-            self.flight.translational_energy[:, 1],
-            label="Translational Energy",
-        )
-        ax1.set_xlim(
-            0,
-            (
-                self.flight.apogee_time
-                if self.flight.apogee_time != 0.0
-                else self.flight.t_final
-            ),
-        )
-        ax1.ticklabel_format(style="sci", axis="y", scilimits=(0, 0))
+        ax1.plot(self.flight.kinetic_energy[:, 0], self.flight.kinetic_energy[:, 1], label="Kinetic Energy")
+        ax1.plot(self.flight.rotational_energy[:, 0], self.flight.rotational_energy[:, 1], label="Rotational Energy")
+        ax1.plot(self.flight.translational_energy[:, 0], self.flight.translational_energy[:, 1], label="Translational Energy")
+        ax1.set_xlim(0, self.flight.apogee_time if self.flight.apogee_time != 0.0 else self.flight.t_final)
+        ax1.ticklabel_format(style="sci", axis="y", scilimits=(0,0))
         ax1.set_title("Kinetic Energy Components")
         ax1.set_xlabel("Time (s)")
         ax1.set_ylabel("Energy (J)")
-
         ax1.legend()
         ax1.grid()
 
         ax2 = plt.subplot(412)
-        ax2.plot(
-            self.flight.total_energy[:, 0],
-            self.flight.total_energy[:, 1],
-            label="Total Energy",
-        )
-        ax2.plot(
-            self.flight.kinetic_energy[:, 0],
-            self.flight.kinetic_energy[:, 1],
-            label="Kinetic Energy",
-        )
-        ax2.plot(
-            self.flight.potential_energy[:, 0],
-            self.flight.potential_energy[:, 1],
-            label="Potential Energy",
-        )
-        ax2.set_xlim(
-            0,
-            (
-                self.flight.apogee_time
-                if self.flight.apogee_time != 0.0
-                else self.flight.t_final
-            ),
-        )
-        ax2.ticklabel_format(style="sci", axis="y", scilimits=(0, 0))
+        ax2.plot(self.flight.total_energy[:, 0], self.flight.total_energy[:, 1], label="Total Energy")
+        ax2.plot(self.flight.kinetic_energy[:, 0], self.flight.kinetic_energy[:, 1], label="Kinetic Energy")
+        ax2.plot(self.flight.potential_energy[:, 0], self.flight.potential_energy[:, 1], label="Potential Energy")
+        ax2.set_xlim(0, self.flight.apogee_time if self.flight.apogee_time != 0.0 else self.flight.t_final)
+        ax2.ticklabel_format(style="sci", axis="y", scilimits=(0,0))
         ax2.set_title("Total Mechanical Energy Components")
         ax2.set_xlabel("Time (s)")
         ax2.set_ylabel("Energy (J)")
@@ -657,13 +619,9 @@ class _MyFlightPlots:
         ax2.grid()
 
         ax3 = plt.subplot(413)
-        ax3.plot(
-            self.flight.thrust_power[:, 0],
-            self.flight.thrust_power[:, 1],
-            label="|Thrust Power|",
-        )
+        ax3.plot(t, thrust_power_values, label="|Thrust Power|")
         ax3.set_xlim(0, self.flight.rocket.motor.burn_out_time)
-        ax3.ticklabel_format(style="sci", axis="y", scilimits=(0, 0))
+        ax3.ticklabel_format(style="sci", axis="y", scilimits=(0,0))
         ax3.set_title("Thrust Absolute Power")
         ax3.set_xlabel("Time (s)")
         ax3.set_ylabel("Power (W)")
@@ -671,20 +629,9 @@ class _MyFlightPlots:
         ax3.grid()
 
         ax4 = plt.subplot(414)
-        ax4.plot(
-            self.flight.drag_power[:, 0],
-            -self.flight.drag_power[:, 1],
-            label="|Drag Power|",
-        )
-        ax4.set_xlim(
-            0,
-            (
-                self.flight.apogee_time
-                if self.flight.apogee_time != 0.0
-                else self.flight.t_final
-            ),
-        )
-        ax3.ticklabel_format(style="sci", axis="y", scilimits=(0, 0))
+        ax4.plot(t, -drag_power_values, label="|Drag Power|")
+        ax4.set_xlim(0, self.flight.apogee_time if self.flight.apogee_time != 0.0 else self.flight.t_final)
+        ax4.ticklabel_format(style="sci", axis="y", scilimits=(0,0))
         ax4.set_title("Drag Absolute Power")
         ax4.set_xlabel("Time (s)")
         ax4.set_ylabel("Power (W)")
