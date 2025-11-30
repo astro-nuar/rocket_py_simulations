@@ -131,16 +131,35 @@ def load_flight_from_json(config_path: str):
         # Check if the rocket has reached burnout
         if time < motor.burn_out_time:
             return None
-
-        if altitude_AGL < 500:
+        '''
+        if altitude_AGL < 0:
             air_brakes.deployment_level = 0
-        elif 500 < altitude_AGL < 1500:
-            air_brakes.deployment_level = 0.1
-        elif 1500 < altitude_AGL < 3000:
-            air_brakes.deployment_level = 0.2
-        elif altitude_AGL > 3000:
+        elif 0 < altitude_AGL <2000:
             air_brakes.deployment_level = 1
+        elif 2000 < altitude_AGL <= 3000:
+            air_brakes.deployment_level = 0.75
+        '''
+        new_deployment_level = 0
 
+        if time <= 11.4:
+            new_deployment_level = 1
+        else:
+            new_deployment_level = (
+                -0.002906 * np.power(time, 3)
+                + 0.1497 * np.power(time, 2)
+                + -2.563 * time
+                + 14.96
+            )
+
+        if time > 19.6:
+            new_deployment_level = 0
+
+        if time < 3.8:
+            new_deployment_level = 0
+
+        air_brakes.deployment_level = new_deployment_level
+
+            
         '''
         # If below 1500 meters above ground level, air_brakes are not deployed
         if altitude_AGL < 1500:

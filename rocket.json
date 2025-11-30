@@ -41,7 +41,7 @@
   "rocket": {
     "comments": "!! The mass term is WITHOUT the motor, if its 25kg here the rocket will be 25kg + motor mass !! Later mass was 22",
     "radius": 0.0625,
-    "mass":  24.5,
+    "mass":  22.8,
     "inertia": [6.321, 6.321, 0.034],
     "power_off_drag": "powerOffDragCurve.csv",
     "power_on_drag": "powerOnDragCurve.csv",
@@ -106,7 +106,7 @@
   "flight": {
     "comments": "rail_length is as defined in the regulation",
     "rail_length": 4,
-    "inclination": 85,
+    "inclination": 84,
     "heading": 0
   }
 }
