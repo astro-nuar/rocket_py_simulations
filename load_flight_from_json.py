@@ -100,7 +100,7 @@ def load_flight_from_json(config_path: str):
         length = tail["length"],
         position = tail["position"],
     )
-
+    '''
      # --- Controller for air brakes ---
     # This function will close over env and motor variables defined above.
     def controller_function(time, sampling_rate, state, state_history, observed_variables, air_brakes):
@@ -131,14 +131,14 @@ def load_flight_from_json(config_path: str):
         # Check if the rocket has reached burnout
         if time < motor.burn_out_time:
             return None
-        '''
+        
         if altitude_AGL < 0:
             air_brakes.deployment_level = 0
         elif 0 < altitude_AGL <2000:
             air_brakes.deployment_level = 1
         elif 2000 < altitude_AGL <= 3000:
             air_brakes.deployment_level = 0.75
-        '''
+        
         new_deployment_level = 0
 
         if time <= 11.4:
@@ -160,7 +160,7 @@ def load_flight_from_json(config_path: str):
         air_brakes.deployment_level = new_deployment_level
 
             
-        '''
+        
         # If below 1500 meters above ground level, air_brakes are not deployed
         if altitude_AGL < 1500:
             air_brakes.deployment_level = 0
@@ -180,8 +180,7 @@ def load_flight_from_json(config_path: str):
             upper_bound = air_brakes.deployment_level + max_change
             new_deployment_level = min(max(new_deployment_level, lower_bound), upper_bound)
 
-            air_brakes.deployment_level = new_deployment_level
-        '''
+            air_brakes.deployment_level = new_deployment_level    
         
         return (
             time,
@@ -200,7 +199,60 @@ def load_flight_from_json(config_path: str):
         cd_curve = air_brakes_data["drag_coefficient_curve"]
         
         air_brakes = rocket.add_air_brakes(
-        drag_coefficient_curve=[
+        drag_coefficient_curve=
+        path + cd_curve,
+                controller_function=controller_function,
+                sampling_rate=air_brakes_data["sampling_rate"],
+                reference_area=air_brakes_data["reference_area"],
+                clamp=True,
+                initial_observed_variables=[0, 0, 0],
+                override_rocket_drag=False,
+                name="Air Brakes",
+            )
+            # optional info printing
+        
+        air_brakes.all_info()
+        #except Exception as e:
+        #    warnings.warn(f"Failed to add air brakes: {e}")
+        air_brakes = None
+    '''
+
+    # Parachutes
+    for chute_name, chute_data in rocket_data["parachutes"].items():
+        
+        rocket.add_parachute(
+        
+            chute_data["name"],
+        
+            cd_s =  int(chute_data["drag_coefficient"]) * int(chute_data["area"]),
+        
+            trigger = chute_data["trigger"],
+        
+            sampling_rate = chute_data["sampling_rate"],
+        
+            lag = chute_data["lag"],
+        
+            noise = tuple(chute_data["noise"]),
+        )
+
+    # --- Flight ---
+    flight_data  =  config["flight"]
+    flight  =  Flight(
+        rocket = rocket,
+    
+        environment = env,
+    
+        rail_length = flight_data["rail_length"],
+    
+        inclination = flight_data["inclination"],
+    
+        heading = flight_data["heading"],
+    )
+
+    return env, motor, rocket, flight
+    
+    ''' 
+        [
         # Mach 0.1
         [0, 0.1, 0.7692],
         [10 / 100, 0.1, 0.7663],
@@ -333,52 +385,5 @@ def load_flight_from_json(config_path: str):
         [80 / 100, 1.1, 1.0069],
         [90 / 100, 1.1, 1.0253],
         [100 / 100, 1.1, 1.0560],
-    ],#path + cd_curve,
-                controller_function=controller_function,
-                sampling_rate=air_brakes_data["sampling_rate"],
-                reference_area=air_brakes_data["reference_area"],
-                clamp=True,
-                initial_observed_variables=[0, 0, 0],
-                override_rocket_drag=False,
-                name="Air Brakes",
-            )
-            # optional info printing
-        
-        air_brakes.all_info()
-        #except Exception as e:
-        #    warnings.warn(f"Failed to add air brakes: {e}")
-        #    air_brakes = None
-
-    # Parachutes
-    for chute_name, chute_data in rocket_data["parachutes"].items():
-        
-        rocket.add_parachute(
-        
-            chute_data["name"],
-        
-            cd_s =  int(chute_data["drag_coefficient"]) * int(chute_data["area"]),
-        
-            trigger = chute_data["trigger"],
-        
-            sampling_rate = chute_data["sampling_rate"],
-        
-            lag = chute_data["lag"],
-        
-            noise = tuple(chute_data["noise"]),
-        )
-
-    # --- Flight ---
-    flight_data  =  config["flight"]
-    flight  =  Flight(
-        rocket = rocket,
-    
-        environment = env,
-    
-        rail_length = flight_data["rail_length"],
-    
-        inclination = flight_data["inclination"],
-    
-        heading = flight_data["heading"],
-    )
-
-    return env, motor, rocket, flight
+    ],
+    '''
