@@ -6,6 +6,7 @@
 lib/
 lib64/
 myenv/
+pyvenv.cfg
 
 # User-specific files
 *.rsuser

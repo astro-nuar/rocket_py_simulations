@@ -6,98 +6,127 @@ import json
 from load_flight_from_json import load_flight_from_json
 from rocketpy import EnvironmentAnalysis
 from datetime import datetime
+import sys
+import pandas as pd
 
 config_path = "rocket.json"
 
-li = []
+
+def run_simulation(m):
+    """
+    Updates rocket mass in config file, runs simulation,
+    and returns apogee.
+    """
+    # Load config
+    with open(config_path, "r") as f:
+        config = json.load(f)
+
+    # Update mass
+    config["rocket"]["mass"] = m
+
+    # Save config
+    with open(config_path, "w") as f:
+        json.dump(config, f)
+
+    # Run simulation
+    env, motor, rocket, flight = load_flight_from_json(config_path)
+    return env, motor, rocket, flight
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def plot_mass_vs_apogee(csv_file, target=3000):
+    """
+    Reads mass and apogee data from a CSV and plots apogee vs mass,
+    including target lines and highlighting the closest apogee to target.
+
+    Parameters:
+        csv_file (str): Path to the CSV file with 'mass' and 'apogee' columns.
+        target (float): Target apogee value in meters.
+    """
+    # Read CSV
+    data = pd.read_csv(csv_file)
+    
+    # Ensure expected columns exist
+    if 'mass' not in data.columns or 'apogee' not in data.columns:
+        raise ValueError("CSV must contain 'mass' and 'apogee' columns.")
+    
+    masses = data['mass'].tolist()
+    apogees = data['apogee'].tolist()
+    
+    # Plot results
+    plt.figure(figsize=(10, 6))
+    plt.plot(masses, apogees, 'b-', label="Apogee vs Mass", linewidth=2)
+    plt.xlabel("Mass (kg)", fontsize=12)
+    plt.ylabel("Max Z (m) - Altitude", fontsize=12)
+    plt.title("Rocket Mass Sensitivity Analysis", fontsize=14)
+
+    # Target lines
+    plt.axhline(y=target, color='k', linestyle='--', linewidth=1.5,
+                label=f"Opt Apogee: {target} m")
+    plt.axhline(y=target * 1.04, color='blue', linestyle=':', linewidth=1.2, alpha=0.9, label="±4%")
+    plt.axhline(y=target * 0.96, color='blue', linestyle=':', linewidth=1.2, alpha=0.9)
+    plt.axhline(y=target * 1.02, color='red', linestyle=':', linewidth=1.2, alpha=0.9, label="±2%")
+    plt.axhline(y=target * 0.98, color='red', linestyle=':', linewidth=1.2, alpha=0.9)
+
+    # Find closest to target
+    deviations = [abs(a - target) for a in apogees]
+    closest_idx = deviations.index(min(deviations))
+    plt.plot(masses[closest_idx], apogees[closest_idx], 'ro', markersize=4,
+             label=f'Best: {masses[closest_idx]:.2f} kg')
+
+    plt.grid(True, alpha=0.3)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.show()
+
+# Usage
+# plot_mass_vs_apogee('mass_apogee_data.csv')
+
 
 def main():
-    global m
-    SHOW_ENVIORMENT = False
+    SHOW_ENVIRONMENT = False
     SHOW_ROCKET_INFO = False
     SHOW_FLIGHT_INFO = True
 
-    # Load everything from JSON
-    env, motor, rocket, flight = load_flight_from_json(config_path)
-    
-    """
-    This can be usefull to analys a lot of weather condfition in a span of like 20 years!!
-    env_analysis = EnvironmentAnalysis(
-        start_date=datetime(2002, 10, 6),  # (Year, Month, Day)
-        end_date=datetime(2021, 10, 23),  # (Year, Month, Day)
-        start_hour=4,
-        end_hour=20,
-        latitude=39.3897,
-        longitude=-8.28896388889,
-        surface_data_file=".\specifications\Weather\2b29223b65cdda8d6ace1f38854fb13f\data_stream-oper_stepType-instant.nc",
-        pressure_level_data_file=".\specifications\Weather\2b29223b65cdda8d6ace1f38854fb13f\data_stream-oper_stepType-instant.ncc",
-        timezone="Portugal",
-        unit_system="metric",
-    env_analysis.all_info()
-    )"""
+    masses = []
+    apogees = []
 
-    flight_info = _MyFlightPlots(flight, motor)
+    spinner = ['-', '\\', '|', '/']  # Spinner characters
+    mass_values = np.arange(18.33, 22.5, 0.01)
+    total = len(mass_values)
 
-    with open(r".\\Simulation\\Pro98M1450.txt", 'w+', encoding='utf-8') as file:
-        
-        li.append( (m, flight_info.motor_tradeoff_json["Max Z (m) - Altitude"]) ) 
+    for i, m in enumerate(mass_values):
+        # Run simulation
+        env, motor, rocket, flight = run_simulation(m)
+        flight_info = _MyFlightPlots(flight, motor)
 
-        #for k, v in flight_info.motor_tradeoff_json.items():
-        #    file.write(f"{k}, {v}\n")
-        #    print(f"{k}, {v}\n")
+        # Extract apogee
+        apogee = flight_info.motor_tradeoff_json["Max Z (m) - Altitude"]
+        masses.append(m)
+        apogees.append(apogee)
 
-    if SHOW_FLIGHT_INFO:
-        pass
-        #flight_info.all()
-        #print(flight_info.flight.altitude[:, 1])
-        
-    if SHOW_ROCKET_INFO:
-        rocket.all_info()
-    if SHOW_ENVIORMENT:
-        env.plots.atmospheric_model()
+        # Spinner and percentage
+        spin_char = spinner[i % len(spinner)]
+        percent_complete = (i + 1) / total * 100
 
-for m in np.arange(18.33, 20.5, 0.01):
+        # Print info in the same place using \r and ANSI escape to move up 2 lines
+        sys.stdout.write("\033[F\033[F") if i > 0 else None  # move cursor up 2 lines after first loop
+        print(f"{spin_char} {percent_complete:.2f}% complete")
+        print(f"Current mass: {m:.2f} kg, Current apogee: {apogee:.2f} m")
+        sys.stdout.flush()
 
-    with open(config_path, "r") as f:
-        config  =  json.load(f)
+    # Save to CSV
+    df = pd.DataFrame({
+        "Mass (kg)": masses,
+        "Apogee (m)": apogees
+    })
+    df.to_csv("mass_apogee_data.csv", index=False)
+    print("Saved mass and apogee data to 'mass_apogee_data.csv'.")
 
-        config["rocket"]["mass"] = m
+    plot_mass_vs_apogee("mass_apogee_data.csv", 3000)
 
-        with open(config_path, 'w') as f:
-            json.dump(config, f)
-            f.close()
-        
-        main()
 
-masses, apogees = zip(*li)
+if __name__ == "__main__":
+    main()
 
-plt.figure(figsize=(10, 6))
-plt.plot(masses, apogees, 'b-', label="Apogee vs Mass", linewidth=2)
-plt.xlabel("Mass (kg)", fontsize=12)
-plt.ylabel("Max Z (m) - Altitude", fontsize=12)
-plt.title("Rocket Mass Sensitivity Analysis", fontsize=14)
-
-# Target lines
-target = 3000
-plt.axhline(y=target, color='k', linestyle='--', linewidth=1.5, label=f"Opt Apogee: {target} m")
-
-plt.axhline(y=target*1.04, color='blue', linestyle=':', linewidth=1.2, alpha=0.9, label="±4%")
-
-plt.axhline(y=target*0.96, color='blue', linestyle=':', linewidth=1.2, alpha=0.9)
-
-plt.axhline(y=target*1.02, color='red', linestyle=':', linewidth=1.2, alpha=0.9, label="±2%")
-
-plt.axhline(y=target*0.98, color='red', linestyle=':', linewidth=1.2, alpha=0.9)
-
-# Find closest to target
-deviations = [abs(apogee - target) for apogee in apogees]
-
-closest_idx = deviations.index(min(deviations))
-
-plt.plot(masses[closest_idx], apogees[closest_idx], 'ro', markersize=4, 
-            label=f'Best: {masses[closest_idx]:.2f} kg')
-
-plt.grid(True, alpha=0.3)
-plt.legend(loc='best')
-plt.tight_layout()
-plt.show()

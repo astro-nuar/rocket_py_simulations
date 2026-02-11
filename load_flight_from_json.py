@@ -53,13 +53,13 @@ def load_flight_from_json(config_path: str):
 
     # --- Rocket ---
     rocket_data  =  config["rocket"]
-    
+
     rocket  =  Rocket(
         radius = rocket_data["radius"],
         mass = rocket_data["mass"],
         inertia = tuple(rocket_data["inertia"]),
-        power_off_drag = path + rocket_data["power_off_drag"],
-        power_on_drag = path + rocket_data["power_on_drag"],
+        power_off_drag = "./specifications/PowerOffDragCurve1.csv",
+        power_on_drag = "./specifications/PowerOnDragCurve1.csv",
         center_of_mass_without_motor = rocket_data["center_of_mass_without_motor"],
         coordinate_system_orientation = rocket_data["coordinate_system_orientation"],
     )

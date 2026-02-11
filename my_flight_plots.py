@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from functools import cached_property
+import pandas as pd
 
 class _MyFlightPlots:
     """Class that holds plot methods for Flight class.
@@ -17,7 +18,7 @@ class _MyFlightPlots:
     _FlightPlots.first_event_time_index : int
         Time index of first event.
     """
-    output_dir = "Simulation\images"
+    output_dir = "Simulation\\images"
 
     def __init__(self, flight, motor):
         """Initializes _FlightPlots class.
@@ -890,3 +891,66 @@ class _MyFlightPlots:
         self.pressure_signals()
 
         return None
+
+def plot_mass_vs_apogee(csv_file, target=3000):
+    """
+    Reads mass and apogee data from a CSV and plots apogee vs mass,
+    including target lines and highlighting the closest apogee to target
+    and ±2% / ±4% of the target.
+
+    Parameters:
+        csv_file (str): Path to the CSV file with 'Mass (kg)' and 'Apogee (m)' columns.
+        target (float): Target apogee value in meters.
+    """
+    # Read CSV
+    data = pd.read_csv(csv_file)
+    
+    # Ensure expected columns exist
+    if 'Mass (kg)' not in data.columns or 'Apogee (m)' not in data.columns:
+        raise ValueError("CSV must contain 'Mass (kg)' and 'Apogee (m)' columns.")
+    
+    masses = data['Mass (kg)'].tolist()
+    apogees = data['Apogee (m)'].tolist()
+    
+    # Plot results
+    plt.figure(figsize=(10, 6))
+    plt.plot(masses, apogees, 'b-', label="Apogee vs Mass", linewidth=2)
+    plt.xlabel("Mass (kg)", fontsize=12)
+    plt.ylabel("Max Z (m) - Altitude", fontsize=12)
+    plt.title("Rocket Mass Sensitivity Analysis", fontsize=14)
+
+    # Define thresholds
+    thresholds = {
+        'target': target,
+        '+2%': target * 1.02,
+        '-2%': target * 0.98,
+        '+4%': target * 1.04,
+        '-4%': target * 0.96
+    }
+
+    # Plot horizontal lines for thresholds
+    plt.axhline(y=thresholds['target'], color='k', linestyle='--', linewidth=1.5,
+                label=f"Opt Apogee: {target} m")
+    plt.axhline(y=thresholds['+2%'], color='red', linestyle=':', linewidth=1.2, alpha=0.9, label="±2%")
+    plt.axhline(y=thresholds['-2%'], color='red', linestyle=':', linewidth=1.2, alpha=0.9)
+    plt.axhline(y=thresholds['+4%'], color='blue', linestyle=':', linewidth=1.2, alpha=0.9, label="±4%")
+    plt.axhline(y=thresholds['-4%'], color='blue', linestyle=':', linewidth=1.2, alpha=0.9)
+
+    # Find closest points for each threshold
+    def closest_point(values, target_value):
+        deviations = [abs(a - target_value) for a in values]
+        idx = deviations.index(min(deviations))
+        return idx
+
+    closest_indices = {name: closest_point(apogees, val) for name, val in thresholds.items()}
+
+    # Plot points
+    colors = {'target': 'red', '+2%': 'red', '-2%': 'red', '+4%': 'blue', '-4%': 'blue'}
+    for name, idx in closest_indices.items():
+        plt.plot(masses[idx], apogees[idx], 'o', color=colors[name], markersize=6,
+                 label=f"{name} point: {masses[idx]:.2f} kg")
+
+    plt.grid(True, alpha=0.3)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.show()
