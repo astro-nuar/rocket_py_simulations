@@ -191,14 +191,6 @@ plt.grid(True, alpha=0.3)
 plt.legend(loc='best')
 plt.tight_layout()
 plt.show()
-'''
-    plt.grid(True, alpha=0.3)
-    plt.legend(loc='best')
-    plt.tight_layout()
-    plt.show()
-
-# Usage
-# plot_mass_vs_apogee('mass_apogee_data.csv')
 
 
 def main():
@@ -246,4 +238,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
+'''
+# Usage
+# plot_mass_vs_apogee('mass_apogee_data.csv')
