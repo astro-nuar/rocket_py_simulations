@@ -3,12 +3,16 @@ import datetime
 import warnings
 import numpy as np
 from rocketpy import Environment, SolidMotor, Rocket, Flight
+from rocketpy import Accelerometer, Barometer, GnssReceiver, Gyroscope
 
-def load_flight_from_json(config_path: str):
+def load_flight_from_json(config_path, sensor_path: str):
 
     # Load configuration file
     with open(config_path, "r") as f:
         config  =  json.load(f)
+
+    with open(sensor_path, "r") as f:
+        config_sensor  =  json.load(f)
     
     path  =  config["path"]
 
@@ -100,6 +104,60 @@ def load_flight_from_json(config_path: str):
         length = tail["length"],
         position = tail["position"],
     )
+
+    accel = Accelerometer(
+    sampling_rate=config_sensor["Acc-high-g"]["sampling_rate"],
+    consider_gravity=False,
+    noise_density=config_sensor["Acc-high-g"]["noise_density"],      
+    constant_bias=config_sensor["Acc-high-g"]["constant_bias"],       
+    measurement_range=config_sensor["Acc-high-g"]["measurement_range"],
+    resolution=config_sensor["Acc-high-g"]["resolution"],   
+    name=config_sensor["Acc-high-g"]["name"],
+    cross_axis_sensitivity=config_sensor["Acc-high-g"]["cross_axis_sensitivity"]
+    )
+
+    rocket.add_sensor(accel, 1.278)
+
+    imu_acc = Accelerometer(
+    sampling_rate=config_sensor["IMU_Acc"]["sampling_rate"],
+    consider_gravity=False,
+    noise_density=config_sensor["IMU_Acc"]["noise_density"],     
+    measurement_range=config_sensor["IMU_Acc"]["measurement_range"],
+    resolution=config_sensor["IMU_Acc"]["resolution"], 
+    name=config_sensor["IMU_Acc"]["name"],
+    )
+
+    rocket.add_sensor(imu_acc, 1.278)
+
+    imu_gyro = Gyroscope(
+    sampling_rate=config_sensor["IMU_Gyro"]["sampling_rate"],
+    noise_density=config_sensor["IMU_Gyro"]["noise_density"],
+    measurement_range=config_sensor["IMU_Gyro"]["measurement_range"],
+    resolution=config_sensor["IMU_Gyro"]["resolution"],       
+    name=config_sensor["IMU_Gyro"]["name"],
+    )
+
+    rocket.add_sensor(imu_gyro, 1.278)
+
+    baro = Barometer(
+    sampling_rate=config_sensor["Barometer"]["sampling_rate"],
+    noise_density=config_sensor["Barometer"]["noise_density"],      
+    measurement_range=config_sensor["Barometer"]["measurement_range"],
+    resolution=config_sensor["Barometer"]["resolution"],       
+    name=config_sensor["Barometer"]["name"],
+    )
+
+    rocket.add_sensor(baro, 1.278)
+
+    gps = GnssReceiver(
+    sampling_rate = config_sensor["GPS"]["sampling_rate"],
+    position_accuracy = config_sensor["GPS"]["position_accuracy"],
+    altitude_accuracy = config_sensor["GPS"]["altitude_accuracy"]
+    )
+
+    rocket.add_sensor(gps, 1.278)
+
+
     '''
      # --- Controller for air brakes ---
     # This function will close over env and motor variables defined above.
@@ -249,7 +307,7 @@ def load_flight_from_json(config_path: str):
         heading = flight_data["heading"],
     )
 
-    return env, motor, rocket, flight
+    return env, motor, rocket, flight, [accel, imu_acc, imu_gyro], baro, gps
     
     ''' 
         [

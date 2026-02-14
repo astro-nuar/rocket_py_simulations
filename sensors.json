@@ -1,0 +1,38 @@
+{
+    "Acc-high-g":{
+    "name":"High-g-Accelerometer",
+    "sampling_rate":100,
+    "noise_density":0.7,           
+    "constant_bias":[-0.006, 0.0004, 0.006],  
+    "measurement_range":200,       
+    "resolution":22.6e-1,
+    "cross_axis_sensitivity":2.5
+    },
+    "IMU_Acc":{
+   "name":"IMU_Acc",
+    "sampling_rate":100,
+    "noise_density":0.8e-3,           
+    "measurement_range":32,       
+    "resolution":1.024e-1
+    },
+    "IMU_Gyro":{
+    "name":"IMU_Gyro",
+    "sampling_rate":100,
+    "noise_density":0.038,           
+    "measurement_range":31.25,       
+    "resolution":1048.6e-1
+    },
+    "Barometer":{
+    "name":"Barometer",
+    "sampling_rate":100,
+    "noise_density":0.024e-3,           
+    "measurement_range":1190e3,       
+    "resolution":0.13e3
+    },
+    "GPS":{
+    "name":"GPS",
+    "sampling_rate":100,
+    "position_accuracy":2,           
+    "altitude_accuracy":2      
+    }
+}
