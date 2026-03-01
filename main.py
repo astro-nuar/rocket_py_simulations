@@ -2,22 +2,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 from rocketpy import Environment, SolidMotor, Rocket, Flight
 from my_flight_plots import _MyFlightPlots
-import json
 from load_flight_from_json import load_flight_from_json
-from rocketpy import EnvironmentAnalysis
 from datetime import datetime
-import sys
+from scipy.signal import savgol_filter
 import pandas as pd
 
 config_path = "rocket.json"
 config_sensor = "sensors.json"
+path_sensors_to_KF= "C:/Users/Claudio Manuel/Desktop/NOVA-FCT/ASTRO/KF/sensors_data"
+dt = 0.01  # 100 Hz
 
 li = []
 
 def main():
     global m
     SHOW_ENVIORMENT = False
-    SHOW_ROCKET_INFO = False
+    SHOW_ROCKET_INFO = False 
     SHOW_FLIGHT_INFO = False
     SHOW_SENSORS = True
 
@@ -42,7 +42,7 @@ def main():
 
     flight_info = _MyFlightPlots(flight, motor)
 
-    with open(r".\\Simulation\\Pro98M1450.txt", 'w+', encoding='utf-8') as file:
+    with open(r"./Simulation/Pro98M1450.txt", 'w+', encoding='utf-8') as file:
         
         li.append( ( flight_info.motor_tradeoff_json["Max Z (m) - Altitude"]) ) 
 
@@ -60,6 +60,7 @@ def main():
         env.plots.atmospheric_model()
     
     if SHOW_SENSORS:
+        
         i = 0
         for sensor in three_axis_sensors:
 
@@ -83,7 +84,93 @@ def main():
             plt.legend()
             plt.show()
 
-            sensor.export_measured_data(f"sensors_data\\exported_{type(sensor).__name__}_{i}_data.csv")
+            if f"{type(sensor).__name__}" == "Gyroscope":
+
+                t = flight.w1[:,0]
+                t_resampled = np.arange(t[0], t[-1], dt)
+
+                w1 = np.interp(t_resampled, flight.w1[:,0], flight.w1[:,1])
+                w2 = np.interp(t_resampled, flight.w2[:,0], flight.w2[:,1])
+                w3 = np.interp(t_resampled, flight.w3[:,0], flight.w3[:,1])
+
+                bgx = w1-mx 
+                bgy = w2-my
+                bgz = w3-mz
+
+                # ---- Low-pass filter parameters ----
+                fc = 0.1          # cutoff frequency (Hz)  (adjust)
+                tau = 1 / (2*np.pi*fc)
+                alpha = dt / (tau + dt)
+
+                # Initialize filtered bias
+                bgx_lpf = np.zeros_like(bgx)
+                bgy_lpf = np.zeros_like(bgy)
+                bgz_lpf = np.zeros_like(bgz)
+
+                # Initial condition
+                bgx_lpf[0] = bgx[0]
+                bgy_lpf[0] = bgy[0]
+                bgz_lpf[0] = bgz[0]
+
+                # Apply LPF
+                for k in range(1, len(bgx)):
+                    bgx_lpf[k] = alpha*bgx[k] + (1-alpha)*bgx_lpf[k-1]
+                    bgy_lpf[k] = alpha*bgy[k] + (1-alpha)*bgy_lpf[k-1]
+                    bgz_lpf[k] = alpha*bgz[k] + (1-alpha)*bgz_lpf[k-1]
+
+                df = pd.DataFrame({
+                "t": t_resampled,
+                "bgx": bgx_lpf,
+                "bgy": bgy_lpf,
+                "bgz": bgz_lpf
+                })
+              
+                _, ax = plt.subplots(nrows=1, ncols=3)
+                
+                ax[0].plot(t_resampled, bgx_lpf, label="lat")
+                ax[0].set_xlabel("Time (s)")
+                ax[0].set_ylabel("Measurement x")
+
+                ax[1].plot(t_resampled, bgy_lpf, label="lon")
+                ax[1].set_xlabel("Time (s)")
+                ax[1].set_ylabel("Measurement y")
+                
+                ax[2].plot(t_resampled, bgz_lpf, label="altitude")
+                ax[2].set_xlabel("Time (s)")        
+                ax[2].set_ylabel("Measurement z")
+
+                plt.title(type(sensor).__name__)
+                plt.legend()
+                plt.show()
+
+                df.to_csv("sensors_data/exported_gyro_bias_data.csv", index=False)
+                df.to_csv(f"{path_sensors_to_KF}/exported_gyro_bias_data.csv", index=False)
+
+            elif f"{type(sensor).__name__}" == "Accelerometer":
+                
+                t = flight.ax[:,0]
+                t_resampled = np.arange(t[0], t[-1], dt)
+
+                ax = np.interp(t_resampled, flight.ax[:,0], flight.ax[:,1])
+                ay = np.interp(t_resampled, flight.ay[:,0], flight.ay[:,1])
+                az = np.interp(t_resampled, flight.az[:,0], flight.az[:,1])
+
+                bax = ax-mx 
+                bay = ay-my
+                baz = az-mz
+
+                df = pd.DataFrame({
+                "t": t_resampled,
+                "bax": bax,
+                "bay": bay,
+                "baz": baz
+                })
+
+                df.to_csv(f"sensors_data/exported_acc_bias_{i}_data.csv", index=False)
+                df.to_csv(f"{path_sensors_to_KF}/exported_acc_bias_{i}_data.csv", index=False)
+
+            sensor.export_measured_data(f"sensors_data/exported_{type(sensor).__name__}_{i}_data.csv")
+            sensor.export_measured_data(f"{path_sensors_to_KF}/exported_{type(sensor).__name__}_{i}_data.csv")
             i+=1
 
         time_barometer, pressure_barometer = zip(*baro.measured_data)
@@ -94,8 +181,9 @@ def main():
         plt.title(type(baro).__name__)
         plt.show()
 
-        baro.export_measured_data(f"sensors_data\\exported_{type(baro).__name__}_data.csv")
-
+        baro.export_measured_data(f"sensors_data/exported_{type(baro).__name__}_data.csv")
+        baro.export_measured_data(f"{path_sensors_to_KF}/exported_{type(baro).__name__}_data.csv")
+        
         time_gps, lat, lon, h  = zip(*gps.measured_data)
 
         _, ax = plt.subplots(nrows=1, ncols=3)
@@ -116,7 +204,42 @@ def main():
         plt.legend()
         plt.show()
 
-        gps.export_measured_data(f"sensors_data\\exported_{type(gps).__name__}_data.csv")
+        gps.export_measured_data(f"sensors_data/exported_{type(gps).__name__}_data.csv")
+        gps.export_measured_data(f"{path_sensors_to_KF}/exported_{type(gps).__name__}_data.csv")
+
+        time_velocity = flight.vx[:,0]
+        t_resampled = np.arange(time_velocity[0], time_velocity[-1], dt)
+        
+        vx = np.interp(t_resampled, flight.vx[:,0], flight.vx[:,1])
+        vy = np.interp(t_resampled, flight.vy[:,0], flight.vy[:,1])
+        vz = np.interp(t_resampled, flight.vz[:,0], flight.vz[:,1])
+
+        df = pd.DataFrame({
+            "t": t_resampled,
+            "Vx": vx,
+            "Vy": vy,
+            "Vz": vz
+        })
+
+        _, ax = plt.subplots(nrows=1, ncols=3)
+            
+        ax[0].plot(t_resampled, vx, label="lat")
+        ax[0].set_xlabel("Time (s)")
+        ax[0].set_ylabel("Measurement x")
+
+        ax[1].plot(t_resampled, vy, label="lon")
+        ax[1].set_xlabel("Time (s)")
+        ax[1].set_ylabel("Measurement y")
+            
+        ax[2].plot(t_resampled, vz, label="altitude")
+        ax[2].set_xlabel("Time (s)")        
+        ax[2].set_ylabel("Measurement z")
+
+        plt.legend()
+        plt.show()
+
+        df.to_csv("sensors_data/exported_velocity_data.csv", index=False)
+        df.to_csv(f"{path_sensors_to_KF}/exported_velocity_data.csv", index=False)
 
 main()
 
@@ -201,7 +324,7 @@ def main():
     masses = []
     apogees = []
 
-    spinner = ['-', '\\', '|', '/']  # Spinner characters
+    spinner = ['-', '/', '|', '/']  # Spinner characters
     mass_values = np.arange(18.33, 22.5, 0.01)
     total = len(mass_values)
 
