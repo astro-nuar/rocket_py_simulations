@@ -18,8 +18,8 @@ def main():
     global m
     SHOW_ENVIORMENT = False
     SHOW_ROCKET_INFO = False 
-    SHOW_FLIGHT_INFO = False
-    SHOW_SENSORS = True
+    SHOW_FLIGHT_INFO = True
+    SHOW_SENSORS = False
 
     # Load everything from JSON
     env, motor, rocket, flight, three_axis_sensors, baro, gps = load_flight_from_json(config_path, config_sensor)

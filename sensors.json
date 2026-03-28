@@ -4,23 +4,23 @@
     "sampling_rate":100,
     "noise_density":0,           
     "constant_bias":[-0.006, 0.0004, 0.006],  
-    "measurement_range":200,       
+    "measurement_range":1962,       
     "resolution":22.6e-1,
     "cross_axis_sensitivity":2.5
     },
     "IMU_Acc":{
-   "name":"IMU_Acc",
+    "name":"IMU_Acc",
     "sampling_rate":100,
-    "noise_density":0,           
-    "measurement_range":32,       
-    "resolution":1.024e-1
+    "noise_density":1275.3e-6,           
+    "measurement_range":156.96,       
+    "resolution":4.78728e-3
     },
     "IMU_Gyro":{
     "name":"IMU_Gyro",
     "sampling_rate":100,
-    "noise_density":0,           
-    "measurement_range": 0.2727,
-    "resolution": 8.3e-6
+    "noise_density":0.066e-3,           
+    "measurement_range":2.18,
+    "resolution": 0.07e-3
     },
     "Barometer":{
     "name":"Barometer",
